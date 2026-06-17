@@ -1,0 +1,49 @@
+* KDE DPMS Inhibitor
+
+Kodi service addon for KDE Wayland that delegates screensaver and DPMS
+management to KWin rather than controlling the display directly.
+
+This is needed because when running in a Wayland session and with a
+screensaver addon configured Kodi will always inhibit the
+compositor-level screensaver, but does not (currently) support DPMS
+management. When no screensaver addon is configured Kodi will not be
+aware of the compositor screensaver state so will not know to disable
+it, and remote user activity (like remote-control apps) will not
+register to the compositor.
+
+** How it works
+
+The addon holds a =org.freedesktop.ScreenSaver= D-Bus inhibit while the
+user is active in Kodi, preventing KWin from blanking the display or
+activating the screensaver. When Kodi's idle timer exceeds the configured
+threshold, the inhibit is released and KWin takes over - applying its own
+screensaver and DPMS settings as configured in System Settings.
+
+When user activity is detected after the inhibit has been released (i.e.
+the screen may be off), the addon sends a =org.kde.Solid.PowerManagement.wakeup=
+signal before re-acquiring the inhibit.
+
+The addon polls =xbmc.getGlobalIdleTime()= at a configurable interval and
+detects activity by observing the idle counter reset.
+
+** Dependencies
+
+- KDE Plasma (Wayland)
+- =python-dbus= available to Kodi's Python interpreter
+
+** Configuration
+
+| Setting        | Default | Description                                                  |
+|----------------+---------+--------------------------------------------------------------|
+| Idle threshold | 300 s   | Idle time before the inhibit is released and KWin takes over |
+| Poll interval  | 10 s    | How often =getGlobalIdleTime()= is checked                   |
+
+Configuration changes take effect on the next poll cycle without restarting
+the addon.
+
+** Kodi settings
+
+Set the Kodi screensaver to /None/ under Settings → Interface →
+Screensaver.
+KWin's screensaver and DPMS timeouts (System Settings → Power Management →
+Display and Brightness) govern when the display blanks.

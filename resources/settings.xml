@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settings>
+  <category id="general" label="General">
+    <setting id="idle_threshold" type="slider" label="Idle threshold (seconds)" default="300" range="30,30,1800" option="int"/>
+    <setting id="poll_interval" type="slider" label="Poll interval (seconds)" default="10" range="1,1,30" option="int"/>
+  </category>
+</settings>
